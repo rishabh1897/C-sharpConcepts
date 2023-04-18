@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Diagnostics;
 using MultiThreading.Task3.MatrixMultiplier.Matrices;
 using MultiThreading.Task3.MatrixMultiplier.Multipliers;
 
@@ -27,10 +28,25 @@ namespace MultiThreading.Task3.MatrixMultiplier
         private static void CreateAndProcessMatrices(byte sizeOfMatrix)
         {
             Console.WriteLine("Multiplying...");
-            var firstMatrix = new Matrix(sizeOfMatrix, sizeOfMatrix);
-            var secondMatrix = new Matrix(sizeOfMatrix, sizeOfMatrix);
+            var firstMatrix = new Matrix(sizeOfMatrix, sizeOfMatrix, true);
+            var secondMatrix = new Matrix(sizeOfMatrix, sizeOfMatrix, true);
 
+            Stopwatch stopwatch = new Stopwatch();
+
+            stopwatch.Start();
             IMatrix resultMatrix = new MatricesMultiplier().Multiply(firstMatrix, secondMatrix);
+            stopwatch.Stop();
+
+            Console.Error.WriteLine("Sequential loop time in milliseconds: {0}",
+                                    stopwatch.ElapsedMilliseconds);
+            stopwatch.Reset();
+
+            stopwatch.Start();
+            IMatrix resultMatrixParallel = new MatricesMultiplierParallel().Multiply(firstMatrix, secondMatrix);
+            stopwatch.Stop();
+
+            Console.Error.WriteLine("Parallel loop time in milliseconds: {0}",
+                                 stopwatch.ElapsedMilliseconds);
 
             Console.WriteLine("firstMatrix:");
             firstMatrix.Print();
@@ -38,6 +54,8 @@ namespace MultiThreading.Task3.MatrixMultiplier
             secondMatrix.Print();
             Console.WriteLine("resultMatrix:");
             resultMatrix.Print();
+            Console.WriteLine("resultMatrixParallel:");
+            resultMatrixParallel.Print();
         }
     }
 }
